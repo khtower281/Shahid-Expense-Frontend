@@ -1,5 +1,5 @@
 import Badge from '../ui/Badge';
-import { formatDate, formatMoney, currencySymbol } from '../../utils/formatters';
+import { formatDate, formatMoney, currencySymbol, paymentMethodLabel } from '../../utils/formatters';
 
 const statusTone = (s) => (s === 'Completed' ? 'green' : 'amber');
 const currencyTone = (c) => (c === 'USD' ? 'green' : 'blue');
@@ -64,7 +64,9 @@ export function TransactionTableRow({
       </td>
 
       <td className="table-td whitespace-nowrap">
-        <span className="text-slate-600 text-sm">{t.paymentMethod}</span>
+        <span className="text-slate-600 text-sm">
+          {paymentMethodLabel(t.paymentMethod)}
+        </span>
       </td>
 
       <td className="table-td text-right whitespace-nowrap">
@@ -166,7 +168,7 @@ export function TransactionMobileCard({
 
           <div className="flex items-center justify-between mt-3 text-xs text-slate-500">
             <span>{formatDate(t.date)}</span>
-            <span>{t.paymentMethod}</span>
+            <span>{paymentMethodLabel(t.paymentMethod)}</span>
           </div>
 
           <div className="flex items-center gap-1 mt-3 pt-3 border-t border-slate-100">

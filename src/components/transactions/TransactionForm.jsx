@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { ENDPOINTS } from '../../utils/api-endpoints';
-import { toInputDate } from '../../utils/formatters';
+import { toInputDate, paymentMethodLabel } from '../../utils/formatters';
 import Select from '../ui/Select';
 import CategorySelect from '../ui/CategorySelect';
 import ReceiptUploader from './ReceiptUploader';
@@ -83,7 +83,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
     if (!Number.isFinite(amount) || amount <= 0) {
       return 'Amount must be a positive number';
     }
-    /* Check number is optional — no rule here */
     return null;
   };
 
@@ -129,7 +128,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* ---------- Row 1: Date + Currency + Amount ---------- */}
       <div className="grid grid-cols-6 gap-3">
         <div className="col-span-6 sm:col-span-3">
           <label className="label" htmlFor="tx-date">Date *</label>
@@ -176,7 +174,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
         </div>
       </div>
 
-      {/* ---------- Description ---------- */}
       <div>
         <label className="label" htmlFor="tx-desc">Description *</label>
         <textarea
@@ -194,7 +191,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
         </p>
       </div>
 
-      {/* ---------- Category + Status ---------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label">Category *</label>
@@ -217,7 +213,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
         </div>
       </div>
 
-      {/* ---------- Payment method ---------- */}
       <div>
         <label className="label">Payment method *</label>
         <div className="flex gap-2">
@@ -233,14 +228,14 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
                   : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
               }`}
             >
-              {m}
+              {paymentMethodLabel(m)}
             </button>
           ))}
         </div>
 
         {form.paymentMethod === 'Check' && (
           <div className="mt-3 animate-fade-up">
-            <label className="label" htmlFor="tx-check">Check number (optional)</label>
+            <label className="label" htmlFor="tx-check">Cheque number (optional)</label>
             <input
               id="tx-check"
               name="checkNumber"
@@ -256,7 +251,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
         )}
       </div>
 
-      {/* ---------- Receipt ---------- */}
       <div>
         <label className="label">Receipt (optional)</label>
         <ReceiptUploader
@@ -266,7 +260,6 @@ export default function TransactionForm({ initial, categories, onSaved, onCancel
         />
       </div>
 
-      {/* ---------- Actions ---------- */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-slate-100">
         <button
           type="button"

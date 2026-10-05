@@ -8,15 +8,14 @@ import PageHeader from '../components/ui/PageHeader';
 import RangePicker from '../components/dashboard/RangePicker';
 import { computeRange } from '../utils/dateRanges';
 import KpiCard from '../components/dashboard/KpiCard';
-import SpendingTrend from '../components/dashboard/SpendingTrend';
-import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
-import PaymentMethods from '../components/dashboard/PaymentMethods';
+import SpendingByCategory from '../components/dashboard/SpendingByCategory';
+import PaymentMethodsList from '../components/dashboard/PaymentMethodsList';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
 
 export default function Dashboard() {
   const { admin } = useAuth();
 
-  const [range, setRange] = useState('month');
+  const [range, setRange] = useState('all');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
 
@@ -29,8 +28,8 @@ export default function Dashboard() {
   const [totals, setTotals] = useState({ PKR: 0, USD: 0 });
   const [totalCount, setTotalCount] = useState(0);
   const [recent, setRecent] = useState([]);
-  const [dataset, setDataset] = useState([]);
-  const [trendSource, setTrendSource] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [methodData, setMethodData] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,23 +41,15 @@ export default function Dashboard() {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        const [overviewRes, recentRes, datasetRes, trendRes] = await Promise.all([
-          /* KPIs for selected range */
+        const [overviewRes, recentRes, categoryRes, methodRes] = await Promise.all([
           api.get(ENDPOINTS.TRANSACTIONS.BASE, {
             params: { ...rangeParams, page: 1, limit: 1 }
           }),
-          /* Recent 5 within range */
           api.get(ENDPOINTS.TRANSACTIONS.BASE, {
             params: { ...rangeParams, page: 1, limit: 5, sortBy: 'date', order: 'desc' }
           }),
-          /* Last 100 within range for breakdown + payment methods */
-          api.get(ENDPOINTS.TRANSACTIONS.BASE, {
-            params: { ...rangeParams, page: 1, limit: 100, sortBy: 'date', order: 'desc' }
-          }),
-          /* Last 100 (unfiltered) for the 30-day trend */
-          api.get(ENDPOINTS.TRANSACTIONS.BASE, {
-            params: { page: 1, limit: 100, sortBy: 'date', order: 'desc' }
-          })
+          api.get(ENDPOINTS.TRANSACTIONS.CATEGORY_BREAKDOWN, { params: rangeParams }),
+          api.get(ENDPOINTS.TRANSACTIONS.METHOD_BREAKDOWN, { params: rangeParams })
         ]);
 
         if (cancelled) return;
@@ -66,8 +57,8 @@ export default function Dashboard() {
         setTotals(overviewRes.data.totals || { PKR: 0, USD: 0 });
         setTotalCount(overviewRes.data.pagination?.totalCount ?? 0);
         setRecent(recentRes.data.data || []);
-        setDataset(datasetRes.data.data || []);
-        setTrendSource(trendRes.data.data || []);
+        setCategoryData(categoryRes.data.data || []);
+        setMethodData(methodRes.data.data || []);
       } catch (error) {
         if (!cancelled) {
           toast.error(error.response?.data?.message || 'Failed to load dashboard');
@@ -107,8 +98,7 @@ export default function Dashboard() {
         }}
       />
 
-      {/* KPI row — 3 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
         <KpiCard
           label="Total PKR"
           value={`Rs ${formatMoney(totals.PKR)}`}
@@ -145,24 +135,17 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Row 1: Spending trend (2/3) + Payment methods (1/3) */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2">
-          <SpendingTrend transactions={trendSource} loading={loading} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 flex">
+          <SpendingByCategory data={categoryData} loading={loading} />
         </div>
-        <div>
-          <PaymentMethods transactions={dataset} loading={loading} />
+        <div className="flex">
+          <PaymentMethodsList data={methodData} loading={loading} />
         </div>
       </div>
 
-      {/* Row 2: Recent (2/3) + Category breakdown (1/3) */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2">
-          <RecentTransactions transactions={recent} loading={loading} />
-        </div>
-        <div>
-          <CategoryBreakdown transactions={dataset} loading={loading} />
-        </div>
+      <div className="mt-5">
+        <RecentTransactions transactions={recent} loading={loading} />
       </div>
     </div>
   );

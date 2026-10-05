@@ -37,3 +37,13 @@ export const toInputDate = (date) => {
  * Currency symbol for a currency code.
  */
 export const currencySymbol = (currency) => (currency === 'USD' ? '$' : 'Rs');
+
+
+/**
+ * Display label for payment methods.
+ * Stored value is "Check" (backend enum), displayed as "Cheque".
+ */
+export const paymentMethodLabel = (method) => {
+  if (method === 'Check') return 'Cheque';
+  return method || '';
+};

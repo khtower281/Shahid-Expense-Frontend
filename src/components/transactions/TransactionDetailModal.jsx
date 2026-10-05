@@ -1,6 +1,6 @@
 import Modal from '../ui/Modal';
 import Badge from '../ui/Badge';
-import { formatDate, formatMoney, currencySymbol } from '../../utils/formatters';
+import { formatDate, formatMoney, currencySymbol, paymentMethodLabel } from '../../utils/formatters';
 
 export default function TransactionDetailModal({ open, onClose, transaction, onEdit }) {
   if (!transaction) return null;
@@ -8,12 +8,11 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
   const t = transaction;
   const isPdf =
     t.receiptUrl && t.receiptUrl.toLowerCase().endsWith('.pdf');
-  const isImage =
-    t.receiptUrl && !isPdf;
+  const isImage = t.receiptUrl && !isPdf;
 
   return (
     <Modal open={open} onClose={onClose} title="Transaction details" maxWidth="max-w-2xl">
-      {/* ============ Header summary ============ */}
+      {/* Header summary */}
       <div className="rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800 text-white p-5 sm:p-6 mb-6 shadow-lg">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -24,9 +23,7 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
               {currencySymbol(t.currency)} {formatMoney(t.amount)}
             </p>
           </div>
-          <Badge
-            color={t.status === 'Completed' ? 'green' : 'amber'}
-          >
+          <Badge color={t.status === 'Completed' ? 'green' : 'amber'}>
             {t.status}
           </Badge>
         </div>
@@ -36,7 +33,7 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
         </p>
       </div>
 
-      {/* ============ Details grid ============ */}
+      {/* Details grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <DetailRow label="Date" value={formatDate(t.date)} />
         <DetailRow
@@ -55,9 +52,9 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
             )
           }
         />
-        <DetailRow label="Payment method" value={t.paymentMethod} />
+        <DetailRow label="Payment method" value={paymentMethodLabel(t.paymentMethod)} />
         {t.paymentMethod === 'Check' && (
-          <DetailRow label="Check number" value={t.checkNumber || '—'} />
+          <DetailRow label="Cheque number" value={t.checkNumber || '—'} />
         )}
         <DetailRow label="Currency" value={t.currency} />
         <DetailRow
@@ -78,7 +75,7 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
         />
       </div>
 
-      {/* ============ Receipt preview ============ */}
+      {/* Receipt */}
       <div className="border-t border-slate-100 pt-5">
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-sm font-bold text-slate-700">Receipt</h4>
@@ -137,7 +134,7 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
         )}
       </div>
 
-      {/* ============ Actions ============ */}
+      {/* Actions */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6 pt-5 border-t border-slate-100">
         <button
           type="button"
@@ -167,7 +164,6 @@ export default function TransactionDetailModal({ open, onClose, transaction, onE
   );
 }
 
-/* ---------- Row primitive ---------- */
 function DetailRow({ label, value }) {
   return (
     <div className="rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3">

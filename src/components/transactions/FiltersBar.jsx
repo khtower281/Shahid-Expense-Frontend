@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import Select from '../ui/Select';
+import { paymentMethodLabel } from '../../utils/formatters';
 
 export default function FiltersBar({ filters, onChange, categories, onReset }) {
   const [open, setOpen] = useState(false);
 
   const update = (key, value) => onChange({ ...filters, [key]: value });
 
-  /* Category options */
   const categoryOptions = useMemo(
     () => [
       { value: '', label: 'All categories' },
@@ -27,9 +27,9 @@ export default function FiltersBar({ filters, onChange, categories, onReset }) {
 
   const paymentOptions = [
     { value: '', label: 'All methods' },
-    { value: 'Cash', label: 'Cash' },
-    { value: 'Card', label: 'Card' },
-    { value: 'Check', label: 'Check' }
+    { value: 'Cash', label: paymentMethodLabel('Cash') },
+    { value: 'Card', label: paymentMethodLabel('Card') },
+    { value: 'Check', label: paymentMethodLabel('Check') }
   ];
 
   const currencyOptions = [
@@ -55,7 +55,7 @@ export default function FiltersBar({ filters, onChange, categories, onReset }) {
 
   return (
     <div className="card mb-5 overflow-hidden">
-      {/* ============ Top row: search + toggles ============ */}
+      {/* Top row: search + toggles */}
       <div className="p-3 sm:p-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
         <div className="relative flex-1">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -122,7 +122,7 @@ export default function FiltersBar({ filters, onChange, categories, onReset }) {
         )}
       </div>
 
-      {/* ============ Collapsible advanced panel ============ */}
+      {/* Collapsible advanced panel */}
       <div
         className={`grid transition-all duration-300 ease-out ${
           open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
@@ -217,7 +217,7 @@ export default function FiltersBar({ filters, onChange, categories, onReset }) {
         </div>
       </div>
 
-      {/* ============ Active filter chips ============ */}
+      {/* Active filter chips */}
       {advancedActiveCount > 0 && (
         <div className="border-t border-slate-100 px-3 sm:px-4 py-3 flex flex-wrap gap-2">
           <Chip
@@ -231,7 +231,7 @@ export default function FiltersBar({ filters, onChange, categories, onReset }) {
             show={Boolean(filters.status)}
           />
           <Chip
-            label={`Payment: ${filters.paymentMethod}`}
+            label={`Payment: ${paymentMethodLabel(filters.paymentMethod)}`}
             onRemove={() => update('paymentMethod', '')}
             show={Boolean(filters.paymentMethod)}
           />
@@ -266,7 +266,6 @@ export default function FiltersBar({ filters, onChange, categories, onReset }) {
   );
 }
 
-/* ---------- Small chip component ---------- */
 function Chip({ label, onRemove, show }) {
   if (!show) return null;
   return (
